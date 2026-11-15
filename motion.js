@@ -70,7 +70,8 @@
       const cut = clamp(Math.abs(delta),0,1)*100;
       slide.style.clipPath = slides.length === 1 ? 'none' : (delta <= 0 ? `inset(0 ${cut}% 0 0)` : `inset(0 0 0 ${cut}%)`);
       slide.style.pointerEvents = i === active ? 'auto' : 'none';
-      slide.setAttribute('aria-hidden',String(i !== active));
+      if(innerHeight<=700) slide.removeAttribute('aria-hidden');
+      else slide.setAttribute('aria-hidden',String(i !== active));
       const phone = slide.querySelector('.detail-phone');
       const copy = slide.querySelector(':scope > div');
       const travel = slides.length === 1 ? .5-progress : delta;
