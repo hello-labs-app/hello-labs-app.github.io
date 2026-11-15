@@ -3,20 +3,34 @@
   const preference = matchMedia('(prefers-reduced-motion: reduce)');
   const slides = [...document.querySelectorAll('.screenshot-slide')];
   if (preference.matches) return;
-  // All ordinary sections respond continuously to their viewport position.
-  const ordinary = [...document.querySelectorAll('main > section:not(.screenshot-slide), main > .hero, .legal')];
-  let sectionFrame = false;
+  const clampMotion=(v,a,b)=>Math.max(a,Math.min(b,v));
+  const hero=document.querySelector('main > .hero');
+  let heroTrack;
+  if(hero){heroTrack=document.createElement('div');heroTrack.className='hero-scroll-track';hero.before(heroTrack);heroTrack.append(hero);}
+  const ordinary=[...document.querySelectorAll('main > section:not(.screenshot-slide), .legal')];
+  let sectionFrame=false;
   function renderSections(){
     sectionFrame=false;
+    const reduced=preference.matches;
     ordinary.forEach(section=>{
-      if(preference.matches){section.style.transform='';section.style.opacity='';const phone=section.querySelector('.hero-art .phone');if(phone)phone.style.transform='';return;}
       const rect=section.getBoundingClientRect();
-      const distance=Math.max(-1,Math.min(1,(rect.top+rect.height/2-innerHeight/2)/(innerHeight*.9)));
-      section.style.transform=`translate3d(0,${distance*38}px,0)`;
-      section.style.opacity=String(1-Math.abs(distance)*.08);
-      const heroPhone=section.querySelector('.hero-art .phone');
-      if(heroPhone) heroPhone.style.transform=`perspective(1000px) translateY(${distance*-35}px) rotateY(${distance*12}deg) rotateZ(${8+distance*5}deg)`;
+      const entering=clampMotion((innerHeight*.82-rect.top)/(innerHeight*.58),0,1);
+      [...section.children].forEach((child,i)=>{
+        if(reduced){child.style.transform='';child.style.opacity='';return;}
+        const phase=clampMotion(entering*1.22-i*.045,0,1);
+        child.style.transform=`translate3d(0,${(1-phase)*100}px,0) scale(${.93+.07*phase})`;
+        child.style.opacity=String(.35+.65*phase);
+      });
     });
+    if(heroTrack){
+      heroTrack.classList.toggle('motion-disabled',reduced);
+      const phone=hero.querySelector('.phone'),copy=hero.querySelector('.hero-copy'),art=hero.querySelector('.hero-art');
+      if(reduced){[phone,copy,art].forEach(x=>x.style.transform='');return;}
+      const progress=clampMotion(-heroTrack.getBoundingClientRect().top/(heroTrack.offsetHeight-innerHeight),0,1);
+      phone.style.transform=`perspective(1000px) translate3d(${progress*-50}px,${progress*-25}px,0) rotateY(${-25+progress*70}deg) rotateZ(${12-progress*24}deg) scale(${.88+progress*.23})`;
+      copy.style.transform=`translate3d(0,${progress*-65}px,0) scale(${1-progress*.08})`;
+      art.style.transform=`scale(${1+progress*.06})`;
+    }
   }
   const queueSections=()=>{if(!sectionFrame){sectionFrame=true;requestAnimationFrame(renderSections);}};
   addEventListener('scroll',queueSections,{passive:true});
@@ -56,8 +70,8 @@
       const phone = slide.querySelector('.detail-phone');
       const copy = slide.querySelector(':scope > div');
       const travel = slides.length === 1 ? .5-progress : delta;
-      phone.style.transform = `perspective(1100px) translate3d(${travel*65}px,${travel*34}px,0) rotateY(${travel*-24}deg) rotateZ(${travel*5}deg) scale(${1-Math.min(Math.abs(travel)*.075,.12)})`;
-      copy.style.transform = `translate3d(0,${travel*55}px,0)`;
+      phone.style.transform = `perspective(1100px) translate3d(${travel*160}px,${travel*65}px,0) rotateY(${travel*-65}deg) rotateZ(${travel*14}deg) scale(${1-Math.min(Math.abs(travel)*.075,.12)})`;
+      copy.style.transform = `translate3d(0,${travel*145}px,0)`;
     });
   }
   function schedule(){ if(!queued){queued=true;requestAnimationFrame(render);} }
