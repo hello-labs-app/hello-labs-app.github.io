@@ -60,7 +60,8 @@
       const phone = slide.querySelector('.detail-phone');
       const copy = slide.querySelector(':scope > div');
       const travel = .5-progress;
-      const screenOpacity=slides.length===1?1:clamp(1-Math.abs(delta),0,1);
+      const screenCursor=Math.floor(cursor)+clamp(((cursor%1)-.38)/.24,0,1);
+      const screenOpacity=slides.length===1?1:clamp(1-Math.abs(i-screenCursor),0,1);
       phone.style.opacity=screenOpacity;
       copy.style.opacity=i===active?1:0;
       const caption=phone.querySelector('figcaption');
