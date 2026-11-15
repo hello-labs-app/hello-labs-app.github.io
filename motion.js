@@ -32,7 +32,7 @@
     const active = Math.round(cursor);
     slides.forEach((slide,i) => {
       const delta = i-cursor;
-      const opacity = slides.length === 1 ? 1 : clamp(1-Math.abs(delta),0,1);
+      const opacity = slides.length === 1 ? 1 : clamp((.5-Math.abs(delta))*5,0,1);
       slide.style.opacity = opacity;
       slide.style.pointerEvents = i === active ? 'auto' : 'none';
       slide.setAttribute('aria-hidden',String(i !== active));
