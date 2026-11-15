@@ -75,8 +75,8 @@
       const phone = slide.querySelector('.detail-phone');
       const copy = slide.querySelector(':scope > div');
       const travel = slides.length === 1 ? .5-progress : delta;
-      phone.style.transform = `perspective(1100px) translate3d(${travel*160}px,${travel*65}px,0) rotateY(${travel*-65}deg) rotateZ(${travel*14}deg) scale(${1-Math.min(Math.abs(travel)*.075,.12)})`;
-      copy.style.transform = `translate3d(0,${travel*145}px,0)`;
+      phone.style.transform = `perspective(1100px) translate3d(${travel*65}px,${travel*34}px,0) rotateY(${travel*-24}deg) rotateZ(${travel*5}deg) scale(${1-Math.min(Math.abs(travel)*.075,.12)})`;
+      copy.style.transform = `translate3d(0,${travel*55}px,0)`;
     });
   }
   function schedule(){ if(!queued){queued=true;requestAnimationFrame(render);} }
