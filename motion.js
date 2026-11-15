@@ -11,8 +11,8 @@
   const sectionAnimations = new Map();
   ordinary.forEach(section => [...section.children].forEach(child => {
     if (animate) sectionAnimations.set(child, animate(child, {
-      translateY: [72, 0], scale: [.96, 1], opacity: [.35, 1],
-      duration: 1000, ease: 'outCubic', autoplay: false
+      translateY: [110, 0], scale: [.94, 1], opacity: [.2, 1],
+      duration: 1000, ease: 'inOutSine', autoplay: false
     }));
   }));
   let sectionFrame=false;
@@ -21,10 +21,10 @@
     const reduced=preference.matches;
     ordinary.forEach(section=>{
       const rect=section.getBoundingClientRect();
-      const entering=clampMotion((innerHeight*.82-rect.top)/(innerHeight*.58),0,1);
+      const entering=clampMotion((innerHeight*.95-rect.top)/(innerHeight*.65),0,1);
       [...section.children].forEach((child,i)=>{
         if(reduced){child.style.transform='';child.style.opacity='';return;}
-        const phase=clampMotion(entering*1.22-i*.045,0,1);
+        const phase=clampMotion(entering*1.12-i*.055,0,1);
         const animation=sectionAnimations.get(child);
         if(animation) animation.seek(phase*1000, true);
         else {
@@ -85,8 +85,8 @@
       copy.style.opacity=i===active?1:0;
       const caption=phone.querySelector('figcaption');
       if(caption)caption.style.visibility=i===active?'visible':'hidden';
-      phone.style.transform = `perspective(1100px) translate3d(${travel*65}px,${travel*34}px,0) rotateY(${travel*-24}deg) rotateZ(${travel*5}deg) scale(${1-Math.min(Math.abs(travel)*.075,.12)})`;
-      copy.style.transform = `translate3d(0,${travel*55}px,0)`;
+      phone.style.transform = `perspective(1100px) translate3d(${travel*100}px,${travel*70}px,0) rotateY(${travel*-38}deg) rotateZ(${travel*7}deg) scale(${1-Math.min(Math.abs(travel)*.075,.12)})`;
+      copy.style.transform = `translate3d(0,${travel*75}px,0)`;
     });
   }
   function schedule(){ if(!queued){queued=true;requestAnimationFrame(render);} }

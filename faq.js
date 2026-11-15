@@ -1,6 +1,7 @@
 /* Native <details> remains fully usable without JavaScript or animation support. */
 (() => {
-  if (!Element.prototype.animate) return;
+  const animeAnimate = window.anime?.animate;
+  if (!animeAnimate && !Element.prototype.animate) return;
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   const controls = [];
   document.querySelectorAll('.faq details').forEach(details => {
@@ -29,11 +30,17 @@
       // Keep content mounted during collapse; native closed state follows animation.
       details.open = true;
       details.style.overflow = 'hidden';
-      animation = details.animate(
-        [{height: `${from}px`}, {height: `${to}px`}],
-        {duration: 320, easing: 'cubic-bezier(.22,.72,.25,1)', fill: 'both'}
-      );
-      animation.onfinish = finish;
+      if (animeAnimate) {
+        animation = animeAnimate(details, {
+          height: [from, to], duration: 460, ease: 'outQuart', onComplete: finish
+        });
+      } else {
+        animation = details.animate(
+          [{height: `${from}px`}, {height: `${to}px`}],
+          {duration: 460, easing: 'cubic-bezier(.22,.72,.25,1)', fill: 'both'}
+        );
+        animation.onfinish = finish;
+      }
     });
   });
   reduced.addEventListener('change', () => controls.forEach(finish => finish()));
