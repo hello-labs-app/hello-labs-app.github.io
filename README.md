@@ -19,3 +19,6 @@ Publish the `main` branch, root folder, through GitHub Pages. Expected URL: http
 - No analytics, tracking cookies, external fonts or contact-form service is configured.
 - Google Search Console verification is separate from publishing this site. Add only the exact verification file or meta tag supplied by the account owner. Website publication does not complete Google Play organization verification.
 - Contact: contact.hello.labs@gmail.com.
+
+## Motion dependency
+Anime.js 4.2.2 (MIT), self-hosted under assets/vendor; license retained. npm tarball integrity verified against registry SHA-512. No third-party runtime CDN requests. Paused Anime.js animations are scrubbed by native scroll; homepage hero remains static. FAQ retains its native-details WAAPI implementation.

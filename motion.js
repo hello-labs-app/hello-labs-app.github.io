@@ -5,6 +5,16 @@
   if (preference.matches) return;
   const clampMotion=(v,a,b)=>Math.max(a,Math.min(b,v));
   const ordinary=[...document.querySelectorAll('main > section:not(.screenshot-slide):not(.hero), .legal')];
+  // Pinned, self-hosted Anime.js: paused animations scrub with native scroll.
+  // Keep the old interpolation as a graceful fallback if the vendor file fails.
+  const animate = window.anime?.animate;
+  const sectionAnimations = new Map();
+  ordinary.forEach(section => [...section.children].forEach(child => {
+    if (animate) sectionAnimations.set(child, animate(child, {
+      translateY: [72, 0], scale: [.96, 1], opacity: [.35, 1],
+      duration: 1000, ease: 'outCubic', autoplay: false
+    }));
+  }));
   let sectionFrame=false;
   function renderSections(){
     sectionFrame=false;
@@ -15,8 +25,12 @@
       [...section.children].forEach((child,i)=>{
         if(reduced){child.style.transform='';child.style.opacity='';return;}
         const phase=clampMotion(entering*1.22-i*.045,0,1);
-        child.style.transform=`translate3d(0,${(1-phase)*100}px,0) scale(${.93+.07*phase})`;
-        child.style.opacity=String(.35+.65*phase);
+        const animation=sectionAnimations.get(child);
+        if(animation) animation.seek(phase*1000, true);
+        else {
+          child.style.transform=`translate3d(0,${(1-phase)*72}px,0) scale(${.96+.04*phase})`;
+          child.style.opacity=String(.35+.65*phase);
+        }
       });
     });
 
@@ -34,6 +48,10 @@
   slides[0].before(track);
   track.append(stage);
   slides.forEach(slide => { stage.append(slide); slide.classList.add('story-panel'); });
+  const camera={travel:.5};
+  const cameraAnimation=animate ? animate(camera, {
+    travel: [.5,-.5], duration:1000, ease:'inOutSine', autoplay:false
+  }) : null;
   let queued = false;
   const clamp = (x,a,b) => Math.max(a,Math.min(b,x));
   function render() {
@@ -50,6 +68,7 @@
     const progress = clamp(-track.getBoundingClientRect().top / (track.offsetHeight-height),0,1);
     const cursor = slides.length === 1 ? progress : progress * (slides.length - 1);
     const active = Math.round(cursor);
+    if(cameraAnimation) cameraAnimation.seek(progress*1000, true);
     slides.forEach((slide,i) => {
       const delta = i-cursor;
       slide.style.opacity = 1;
@@ -59,7 +78,7 @@
       else slide.setAttribute('aria-hidden',String(i !== active));
       const phone = slide.querySelector('.detail-phone');
       const copy = slide.querySelector(':scope > div');
-      const travel = .5-progress;
+      const travel = cameraAnimation ? camera.travel : .5-progress;
       const screenCursor=Math.floor(cursor)+clamp(((cursor%1)-.38)/.24,0,1);
       const screenOpacity=slides.length===1?1:clamp(1-Math.abs(i-screenCursor),0,1);
       phone.style.opacity=screenOpacity;
