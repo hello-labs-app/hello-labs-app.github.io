@@ -4,10 +4,7 @@
   const slides = [...document.querySelectorAll('.screenshot-slide')];
   if (preference.matches) return;
   const clampMotion=(v,a,b)=>Math.max(a,Math.min(b,v));
-  const hero=document.querySelector('main > .hero');
-  let heroTrack;
-  if(hero){heroTrack=document.createElement('div');heroTrack.className='hero-scroll-track';hero.before(heroTrack);heroTrack.append(hero);}
-  const ordinary=[...document.querySelectorAll('main > section:not(.screenshot-slide), .legal')];
+  const ordinary=[...document.querySelectorAll('main > section:not(.screenshot-slide):not(.hero), .legal')];
   let sectionFrame=false;
   function renderSections(){
     sectionFrame=false;
@@ -22,15 +19,7 @@
         child.style.opacity=String(.35+.65*phase);
       });
     });
-    if(heroTrack){
-      heroTrack.classList.toggle('motion-disabled',reduced);
-      const phone=hero.querySelector('.phone'),copy=hero.querySelector('.hero-copy'),art=hero.querySelector('.hero-art');
-      if(reduced){[phone,copy,art].forEach(x=>x.style.transform='');return;}
-      const progress=clampMotion(-heroTrack.getBoundingClientRect().top/(heroTrack.offsetHeight-innerHeight),0,1);
-      phone.style.transform=`perspective(1000px) translate3d(${progress*-50}px,${progress*-25}px,0) rotateY(${-25+progress*70}deg) rotateZ(${12-progress*24}deg) scale(${.88+progress*.23})`;
-      copy.style.transform=`translate3d(0,${progress*-65}px,0) scale(${1-progress*.08})`;
-      art.style.transform=`scale(${1+progress*.06})`;
-    }
+
   }
   const queueSections=()=>{if(!sectionFrame){sectionFrame=true;requestAnimationFrame(renderSections);}};
   addEventListener('scroll',queueSections,{passive:true});
