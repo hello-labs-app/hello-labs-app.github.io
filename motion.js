@@ -63,8 +63,12 @@
     const active = Math.round(cursor);
     slides.forEach((slide,i) => {
       const delta = i-cursor;
-      const opacity = slides.length === 1 ? 1 : clamp((.5-Math.abs(delta))*5,0,1);
-      slide.style.opacity = opacity;
+      const visible = slides.length === 1 || Math.abs(delta) < 1;
+      slide.style.opacity = visible ? 1 : 0;
+      // Complementary wipe: incoming and outgoing panels cover the full stage,
+      // with no overlapping copy and no empty midpoint.
+      const cut = clamp(Math.abs(delta),0,1)*100;
+      slide.style.clipPath = slides.length === 1 ? 'none' : (delta <= 0 ? `inset(0 ${cut}% 0 0)` : `inset(0 0 0 ${cut}%)`);
       slide.style.pointerEvents = i === active ? 'auto' : 'none';
       slide.setAttribute('aria-hidden',String(i !== active));
       const phone = slide.querySelector('.detail-phone');
