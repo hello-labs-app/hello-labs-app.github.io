@@ -18,3 +18,5 @@
 
 /* Shared editorial emphasis: same Georgia italic as the original Flight headline. */
 h2 em{font-family:Georgia,serif;font-style:italic;font-weight:400;color:#658264}
+
+@media(max-height:700px),(prefers-reduced-motion:reduce){.story-panel>.detail-phone,.story-panel>div{opacity:1!important}.story-panel figcaption{visibility:visible!important}}

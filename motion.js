@@ -42,7 +42,7 @@
     track.classList.toggle('motion-disabled', reduced);
     if (reduced) {
       track.style.removeProperty('height');
-      slides.forEach(slide => {slide.removeAttribute('aria-hidden'); slide.style.cssText=''; slide.querySelector('.detail-phone').style.cssText=''; slide.querySelector(':scope > div').style.cssText='';});
+      slides.forEach(slide => {slide.removeAttribute('aria-hidden'); slide.style.cssText=''; slide.querySelector('.detail-phone').style.cssText=''; slide.querySelector(':scope > div').style.cssText='';const caption=slide.querySelector('figcaption');if(caption)caption.style.visibility='';});
       return;
     }
     const height = innerHeight;
@@ -52,18 +52,19 @@
     const active = Math.round(cursor);
     slides.forEach((slide,i) => {
       const delta = i-cursor;
-      const visible = slides.length === 1 || Math.abs(delta) < 1;
-      slide.style.opacity = visible ? 1 : 0;
-      // Complementary wipe: incoming and outgoing panels cover the full stage,
-      // with no overlapping copy and no empty midpoint.
-      const cut = clamp(Math.abs(delta),0,1)*100;
-      slide.style.clipPath = slides.length === 1 ? 'none' : (delta <= 0 ? `inset(0 ${cut}% 0 0)` : `inset(0 0 0 ${cut}%)`);
+      slide.style.opacity = 1;
+      slide.style.clipPath = 'none';
       slide.style.pointerEvents = i === active ? 'auto' : 'none';
       if(innerHeight<=700) slide.removeAttribute('aria-hidden');
       else slide.setAttribute('aria-hidden',String(i !== active));
       const phone = slide.querySelector('.detail-phone');
       const copy = slide.querySelector(':scope > div');
-      const travel = slides.length === 1 ? .5-progress : delta;
+      const travel = .5-progress;
+      const screenOpacity=slides.length===1?1:clamp(1-Math.abs(delta),0,1);
+      phone.style.opacity=screenOpacity;
+      copy.style.opacity=i===active?1:0;
+      const caption=phone.querySelector('figcaption');
+      if(caption)caption.style.visibility=i===active?'visible':'hidden';
       phone.style.transform = `perspective(1100px) translate3d(${travel*65}px,${travel*34}px,0) rotateY(${travel*-24}deg) rotateZ(${travel*5}deg) scale(${1-Math.min(Math.abs(travel)*.075,.12)})`;
       copy.style.transform = `translate3d(0,${travel*55}px,0)`;
     });
