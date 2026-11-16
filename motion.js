@@ -1,3 +1,70 @@
+/* Anime.js entrance and interaction choreography, progressively enhanced. */
+(() => {
+  const api = window.anime;
+  if (!api?.animate) return;
+  const preference = matchMedia('(prefers-reduced-motion: reduce)');
+  const running = new Set();
+  const originals = new Map();
+  function remember(element) {
+    if (!originals.has(element)) originals.set(element, element.getAttribute('style'));
+  }
+  function play(elements, options) {
+    const targets = Array.isArray(elements) ? elements : [elements];
+    targets.forEach(remember);
+    const animation = api.animate(targets, {
+      ...options,
+      onComplete: self => running.delete(self)
+    });
+    running.add(animation);
+    return animation;
+  }
+  const hero = document.querySelector('.hero');
+  if (!preference.matches && hero) {
+    const copy = [...hero.querySelector('.hero-copy').children];
+    play(copy, {
+      opacity: [0, 1], translateY: [28, 0],
+      delay: api.stagger(95, {start: 80}), duration: 850, ease: 'outCubic'
+    });
+    const phone = hero.querySelector('.phone');
+    if (phone) play(phone, {
+      opacity: [0, 1], translateY: [55, 0], rotate: [-6, 8],
+      scale: [.92, 1], delay: 220, duration: 1250, ease: 'outQuart'
+    });
+    const note = hero.querySelector('.release-note');
+    if (note) play(note, {
+      opacity: [0, 1], translateY: [20, 0],
+      delay: 650, duration: 750, ease: 'outCubic'
+    });
+  }
+  // One transform owner per target; cancel interrupted hover transitions.
+  const interactive = new Map();
+  document.querySelectorAll('.button, .project-card').forEach(element => {
+    function move(active) {
+      if (preference.matches) return;
+      interactive.get(element)?.cancel();
+      const animation = play(element, {
+        translateY: active ? -5 : 0, duration: 300, ease: 'outCubic'
+      });
+      interactive.set(element, animation);
+    }
+    element.addEventListener('pointerenter', event => {
+      if (event.pointerType !== 'touch') move(true);
+    });
+    element.addEventListener('pointerleave', () => move(element.matches(':focus-visible')));
+    element.addEventListener('focus', () => move(true));
+    element.addEventListener('blur', () => move(element.matches(':hover')));
+  });
+  preference.addEventListener('change', () => {
+    if (!preference.matches) return;
+    running.forEach(animation => animation.cancel());
+    running.clear();
+    originals.forEach((style, element) => {
+      if (style === null) element.removeAttribute('style');
+      else element.setAttribute('style', style);
+    });
+  });
+})();
+
 /* Native scroll drives every frame. No wheel interception, snapping or timed slideshow. */
 (() => {
   const preference = matchMedia('(prefers-reduced-motion: reduce)');
